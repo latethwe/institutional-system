@@ -1,0 +1,303 @@
+{
+  "info": {
+    "name": "Institutional EMIS API",
+    "_postman_id": "e6f1c159-4af5-4742-beb5-54ca5d1d1d78",
+    "description": "Collection for RBAC/ABAC/H3/audit testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('token_admin', json.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Operator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"operator\",\n  \"password\": \"operator123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('token_operator', json.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login Analyst",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"analyst\",\n  \"password\": \"analyst123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('token_analyst', json.access_token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Measurements",
+      "item": [
+        {
+          "name": "Create Measurement (Operator)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_operator}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sensor_id\": 1,\n  \"latitude\": 43.2389,\n  \"longitude\": 76.8897,\n  \"pm25\": 10,\n  \"pm10\": 20\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/measurements",
+              "host": ["{{base_url}}"],
+              "path": ["measurements"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "pm.environment.set('h3_allowed', json.h3_index);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Measurements by H3 (Operator)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token_operator}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/measurements/by-h3/{{h3_allowed}}",
+              "host": ["{{base_url}}"],
+              "path": ["measurements", "by-h3", "{{h3_allowed}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Measurement (Analyst should fail)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token_analyst}}"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sensor_id\": 1,\n  \"latitude\": 43.2389,\n  \"longitude\": 76.8897,\n  \"pm25\": 11,\n  \"pm10\": 21\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/measurements",
+              "host": ["{{base_url}}"],
+              "path": ["measurements"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Region Analytics (Operator)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token_operator}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/analytics/region/{{h3_allowed}}",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "region", "{{h3_allowed}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Region Analytics (Analyst allowed)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token_analyst}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/analytics/region/{{h3_allowed}}",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "region", "{{h3_allowed}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Region Analytics (Analyst denied)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token_analyst}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/analytics/region/{{h3_denied}}",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "region", "{{h3_denied}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Audit",
+      "item": [
+        {
+          "name": "Get Audit Logs (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token_admin}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit-logs",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs"]
+            }
+          }
+        },
+        {
+          "name": "Get Audit Logs (Operator should fail)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token_operator}}"}
+            ],
+            "url": {
+              "raw": "{{base_url}}/audit-logs",
+              "host": ["{{base_url}}"],
+              "path": ["audit-logs"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
