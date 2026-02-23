@@ -50,3 +50,4 @@ On each new measurement, an in-memory event (`measurement.created`) triggers agg
 
 ## Submission-oriented docs
 - Full report: `docs/project_report.md`
+- Link to git: `https://github.com/latethwe/institutional-system`
