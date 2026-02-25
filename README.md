@@ -18,7 +18,7 @@ uvicorn app.main:app --reload
 ```
 
 ## Group member roles
-- Iliyas Malibokov: Architecture & Security
+- Iliyas Malibekov: Architecture & Security
 - Nursultan Zhanbulat: Data Modeling & H3 Integration
 - Zhassulan Tursynbay: Backend APIs & Event-driven Component
 - Nuriya Sultanseitova: QA, Demo Scenarios & Documentation

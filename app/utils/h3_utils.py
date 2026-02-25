@@ -2,7 +2,7 @@ from app.core.config import settings
 
 try:
     import h3
-except Exception as exc:  # pragma: no cover
+except Exception as exc:
     raise RuntimeError("h3 package is required. Install dependencies from requirements.txt") from exc
 
 
